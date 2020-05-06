@@ -1,55 +1,142 @@
-const modDeck = new ModifierDeck({
-  '-2': 0,
-  '-1': 1,
-  '+0': 2,
-  '+1': 7,
-  '+2': 2,
-  '+1 (Rolling)': 2,
-  'x2': 1,
-  'miss': 1
-})
+const BLESS_CARD = {
+  name: "x2 (bless)",
+  once: true
+};
 
-function makeCardElement(card) {
-  const cardEl = document.createElement('div')
-  cardEl.className = 'card'
-  cardEl.innerHTML = `
-    <p class='card-name'>${card.name}</p>
-    <p class='card-id'>${card.id}</p>
-  `;
-  cardEl.class
-  return cardEl
-}
+const CURSE_CARD = {
+  name: "miss (curse)",
+  once: true
+};
 
-function resetPlayed() {
-  const played = document.getElementById('played')
-  played.innerHTML = ''
-}
+Vue.component("modifier-card", {
+  template: `
+    <div class='card'>
+      <p class='card-name'>{{name}}</p>
+    </div>
+  `,
+  props: ["name", "id", "once"]
+});
 
-function showPlayed() {
-  document.getElementById('played')
-  
-}
+Vue.component("modifier-deck", {
+  template: `
+    <div class='mod-deck'>
+      <div class="controls">
+        <button @click="shuffle(true)">Shuffle</button>
+        <button @click="reset(true)">Full Reset</button>
+        <button @click="addBless()">+ Bless</button>
+        <button @click="addCurse()">+ Curse</button>
+      </div>
+      <div class='deck'>
+        <div @click="draw()" class="draw-deck card">
+          <p class='card-name'>Deck ({{cardsLeft}})</p>
+        </div>
+        <div class='played-tray'>
+          <p v-show="needsShuffle">You need to shuffle after this round</p>
+          <button class="close" @click="showPlayed = false" v-show="showPlayed">X</button>
+          <ul :class="{played:true, 'show-all': showPlayed}" @click="showPlayed = true">
+            <modifier-card
+              v-for="card in played.slice().reverse()"
+              :name="card.name"
+              :once="card.once || false"/>
+          </ul>
+        </div>
+      </div>
+    </div>
+  `,
+  props: ["cards"],
+  data: function() {
+    return {
+      deck: [],
+      played: [],
+      showPlayed: false
+    };
+  },
+  computed: {
+    cardsLeft() {
+      return `${this.deck.length} left`;
+    },
+    blessCount() {
+      return this.deck;
+    },
+    needsShuffle() {
+      return (
+        this.played.filter(c => c.name == "miss" || c.name === "x2").length > 0
+      );
+    }
+  },
+  methods: {
+    draw() {
+      const card = this.deck.pop();
+      if (card) {
+        this.played.push(card);
+      }
+      return card;
+    },
+    addBless(count = 1) {
+      for (var i = 0; i < count; i++) {
+        this.deck.push(BLESS_CARD);
+      }
+      this.shuffle(false);
+    },
+    addCurse(count = 1) {
+      for (var i = 0; i < count; i++) {
+        this.deck.push(CURSE_CARD);
+      }
+      this.shuffle(false);
+    },
+    reset(fully = false) {
+      if (fully) {
+        this.deck = this.deck.filter(c => !c.once);
+      }
+      this.deck = this.deck.concat(this.played.filter(c => !c.once));
+      this.played = [];
+    },
+    shuffle(reset = true) {
+      if (reset) {
+        this.reset();
+      }
+      var m = this.deck.length,
+        t,
+        i;
+      // While there remain elements to shuffle…
+      while (m) {
+        // Pick a remaining element…
+        i = Math.floor(Math.random() * m--);
 
-document.getElementById('draw-card').onclick = function () {
-  const card = modDeck.draw()
-  if (card === undefined) {
-    console.log('cannot draw');
-  } else {
-    console.log(card);
-    const played = document.getElementById('played')
-    played.prepend(makeCardElement(card))
+        // And swap it with the current element.
+        t = this.deck[m];
+        this.deck[m] = this.deck[i];
+        this.deck[i] = t;
+      }
+    }
+  },
+  created() {
+    this.deck = Object.entries(this.cards || {}).reduce(
+      (dk, [cardName, cardCount]) => {
+        for (let ct = 0; ct < cardCount; ct++) {
+          dk.push(new Card(cardName));
+        }
+        return dk;
+      },
+      []
+    );
+    this.shuffle();
   }
-}
+});
 
-document.getElementById('shuffle-cards').onclick = function () {
-  modDeck.shuffle()
-  resetPlayed()
-}
-
-document.getElementById('add-card').onclick = function () {
-  const cardName = document.getElementById('new-card-name').value
-  const cardImage = document.getElementById('new-card-image').value
-  const onceOnly = document.getElementById('one-timer').checked
-
-  modDeck.add([new Card(cardName, cardImage, onceOnly)])
-}
+const app = new Vue({
+  el: "#app",
+  data: {
+    message: "hello!",
+    cards: {
+      "-2": 0,
+      "-1": 1,
+      "+0": 2,
+      "+1": 7,
+      "+2": 2,
+      "+1 (Roll)": 2,
+      x2: 1,
+      miss: 1
+    }
+  }
+});

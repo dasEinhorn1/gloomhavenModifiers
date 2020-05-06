@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Gloomhaven Cards</title>
-    <script type="text/javascript" src='cards.js'></script>
-    <link rel="stylesheet" href="master.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script type="text/javascript" src="cards.js"></script>
+    <link rel="stylesheet" href="master.css" />
   </head>
   <body>
-    <div class='controls'>
+    <div id="app" class="">
+      <modifier-deck :cards="cards">
+    </div>
+    <!-- <div class="controls">
       <div class="control">
         <button type="button" id="draw-card">Draw</button>
       </div>
@@ -24,14 +28,14 @@
           <input type="text" id="new-card-image" name="card-img" value="" />
         </div>
         <div class="stack-item">
-          <label for="one-timer" class='cb-label'>Usable once only?</label>
-          <input type="checkbox" id="one-timer" name='one-timer' value="once">
+          <label for="one-timer" class="cb-label">Usable once only?</label>
+          <input type="checkbox" id="one-timer" name="one-timer" value="once" />
         </div>
         <div class="stack-item">
           <button type="button" id="add-card">Add a Card</button>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <div class="deck"></div>
     <div id="played"></div>
