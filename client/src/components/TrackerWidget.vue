@@ -1,21 +1,15 @@
-Vue.component('modifier-card', {
-  template: `
-    <div class='card'>
-      <p class='card-name'>{{name}}</p>
-    </div>
-  `,
-  props: ['name', 'id', 'once'],
-});
+<template>
+  <div class="tracker">
+    <label>{{ label }}</label>
+    <button class="decrease" type="button" name="decrease" @click="dec()">-</button>
+    <input type="text" v-model.number="counter" />
+    <button class="increase" type="button" name="increase" @click="inc()">+</button>
+  </div>
+</template>
 
-Vue.component('tracker-widget', {
-  template: `
-    <div class="tracker">
-      <label>{{ label }}</label>
-      <button class="decrease" type="button" name="decrease" @click="dec()">-</button>
-      <input type="text" v-model.number="counter" />
-      <button class="increase" type="button" name="increase" @click="inc()">+</button>
-    </div>
-  `,
+<script>
+export default {
+  name: 'TrackerWidget',
   props: ['label', 'count', 'max-count', 'min-count'],
   model: {
     prop: 'count',
@@ -51,11 +45,5 @@ Vue.component('tracker-widget', {
       this.counter -= 1;
     },
   },
-});
-
-const app = new Vue({
-  el: '#app',
-  data: {
-    message: 'hello!',
-  },
-});
+};
+</script>

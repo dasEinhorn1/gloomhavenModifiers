@@ -8,38 +8,7 @@
     <link rel="stylesheet" href="master.css" />
   </head>
   <body>
-    <div id="app" class="grid">
-      <header>
-        <h1>Gloomhaven Player Tools</h1>
-      </header>
-      <div class="modifier-deck-wrapper">
-        <h2>Modifier Deck</h2>
-        <modifier-deck :cards="cards"></modifier-deck>
-      </div>
-      <div class="trackers-wrapper">
-        <h2>Trackers</h2>
-        <div class="trackers">
-          <tracker-widget
-            class="health-tracker"
-            v-model="hp"
-            :min-count="0"
-            label="HP"
-          ></tracker-widget>
-          <tracker-widget
-            class="health-tracker"
-            v-model="xp"
-            :min-count="0"
-            label="XP"
-          ></tracker-widget>
-          <tracker-widget
-            class="coin-tracker"
-            v-model="coins"
-            :min-count="0"
-            label="Coins"
-          ></tracker-widget>
-        </div>
-      </div>
-    </div>
+    <div id="app" class="grid"></div>
   </body>
   <script type="text/javascript" src="main.js"></script>
 </html>
