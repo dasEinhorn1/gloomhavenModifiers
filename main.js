@@ -42,7 +42,7 @@ Vue.component("modifier-deck", {
         </div>
         <hr/>
         <div class='played-tray'>
-          <p class="warning light" v-show="needsShuffle">You need to shuffle after this round</p>
+          <p class="warning light" v-if="needsShuffle">You need to shuffle after this round</p>
           <ul :class="{played:true, 'show-all': showPlayed}" @click="showPlayed = !showPlayed">
             <modifier-card
               v-for="card in played.slice().reverse()"
