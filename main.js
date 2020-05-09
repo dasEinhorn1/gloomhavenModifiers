@@ -8,6 +8,15 @@ const CURSE_CARD = {
   once: true
 };
 
+function convertToDeck(cards) {
+  return Object.entries(cards || {}).reduce((dk, [cardName, cardCount]) => {
+    for (let ct = 0; ct < cardCount; ct++) {
+      dk.push(new Card(cardName));
+    }
+    return dk;
+  }, []);
+}
+
 Vue.component("modifier-card", {
   template: `
     <div class='card'>
@@ -21,23 +30,25 @@ Vue.component("modifier-deck", {
   template: `
     <div class='mod-deck'>
       <div class="controls">
-        <button @click="shuffle(true)">Shuffle</button>
-        <button @click="reset(true)">Full Reset</button>
-        <button @click="addBless()">+ Bless</button>
-        <button @click="addCurse()">+ Curse</button>
+        <button class="info" @click="shuffle(true)">Shuffle</button>
+        <button class="info" @click="reset(true)">Full Reset</button>
+        <button class="light" @click="addBless()">+ Bless</button>
+        <button class="dark" @click="addCurse()">+ Curse</button>
       </div>
       <div class='deck'>
-        <div @click="draw()" class="draw-deck card">
-          <p class='card-name'>Deck ({{cardsLeft}})</p>
+        <div @click="draw()" :class="{'draw-deck':true, card:true, 'scroll-adjust': showPlayed}">
+          <p class='card-name'>Deck</p>
+          <p class='card-count'>({{cardsLeft}})</p>
         </div>
+        <hr/>
         <div class='played-tray'>
-          <p v-show="needsShuffle">You need to shuffle after this round</p>
-          <button class="close" @click="showPlayed = false" v-show="showPlayed">X</button>
-          <ul :class="{played:true, 'show-all': showPlayed}" @click="showPlayed = true">
+          <p class="warning light" v-show="needsShuffle">You need to shuffle after this round</p>
+          <ul :class="{played:true, 'show-all': showPlayed}" @click="showPlayed = !showPlayed">
             <modifier-card
               v-for="card in played.slice().reverse()"
               :name="card.name"
-              :once="card.once || false"/>
+              :once="card.once || false">
+            </modifier-card>
           </ul>
         </div>
       </div>
@@ -111,16 +122,54 @@ Vue.component("modifier-deck", {
     }
   },
   created() {
-    this.deck = Object.entries(this.cards || {}).reduce(
-      (dk, [cardName, cardCount]) => {
-        for (let ct = 0; ct < cardCount; ct++) {
-          dk.push(new Card(cardName));
-        }
-        return dk;
-      },
-      []
-    );
+    this.deck = convertToDeck(this.cards);
     this.shuffle();
+  }
+});
+
+Vue.component("tracker-widget", {
+  template: `
+    <div class="tracker">
+      <label>{{ label }}</label>
+      <button class="decrease" type="button" name="decrease" @click="dec()">-</button>
+      <input type="text" v-model.number="counter" />
+      <button class="increase" type="button" name="increase" @click="inc()">+</button>
+    </div>
+  `,
+  props: ["label", "count", "max-count", "min-count"],
+  model: {
+    prop: "count",
+    event: "change"
+  },
+  computed: {
+    counter: {
+      get: function() {
+        return this.count;
+      },
+      set: function(newV) {
+        if (
+          (this.maxCount !== undefined && newV > this.maxCount) ||
+          (this.minCount !== undefined && newV < this.minCount)
+        ) {
+          return;
+        }
+        this.$emit("change", newV || 0);
+      }
+    }
+  },
+  methods: {
+    inc() {
+      if (this.maxCount !== undefined && this.count + 1 > this.maxCount) {
+        return;
+      }
+      this.counter = this.counter + 1;
+    },
+    dec() {
+      if (this.minCount !== undefined && this.count - 1 < this.maxCount) {
+        return;
+      }
+      this.counter = this.counter - 1;
+    }
   }
 });
 
@@ -137,6 +186,9 @@ const app = new Vue({
       "+1 (Roll)": 4,
       x2: 1,
       miss: 1
-    }
+    },
+    hp: 20,
+    xp: 0,
+    coins: 0
   }
 });
