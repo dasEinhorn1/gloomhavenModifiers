@@ -14,7 +14,7 @@
     "eslint-config-airbnb-base": "^14.1.0",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-vue": "^6.2.2",
-    "mocha": "^7.1.2"
+    "mocha": "^10.2.0"
   },
   "scripts": {
     "test": "mocha"
